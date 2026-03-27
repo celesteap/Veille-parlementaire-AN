@@ -4,9 +4,9 @@ import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# Configuration via les secrets GitHub
+# Configuration pour OUTLOOK
 SMTP_SERVER = "smtp.office365.com"
-SMTP_PORT = 587
+SMTP_PORT = 587  # Port standard pour Outlook avec STARTTLS
 EMAIL_USER = os.environ['EMAIL_USER']
 EMAIL_PASS = os.environ['EMAIL_PASS']
 DEST_EMAIL = os.environ['DEST_EMAIL']
@@ -21,25 +21,36 @@ def send_email(entry):
 
     html = f"""
     <html>
-      <body style="font-family: Arial, sans-serif;">
-        <h2 style="color: #0055a4;">Nouveau document parlementaire</h2>
-        <p><strong>Titre :</strong> {entry.title}</p>
-        <p><strong>Description :</strong> {entry.description}</p>
-        <hr>
-        <a href="{entry.link}" style="background-color: #0055a4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Consulter le document</a>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <div style="background-color: #0055a4; color: white; padding: 20px; text-align: center;">
+            <h1>Veille Parlementaire</h1>
+        </div>
+        <div style="padding: 20px; border: 1px solid #ddd;">
+            <h2 style="color: #0055a4;">{entry.title}</h2>
+            <p>{entry.description}</p>
+            <br>
+            <a href="{entry.link}" style="display: inline-block; background-color: #0055a4; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Lire le document complet</a>
+        </div>
+        <p style="font-size: 11px; color: #888; margin-top: 20px;">Source : Flux RSS de l'Assemblée nationale</p>
       </body>
     </html>
     """
     msg.attach(MIMEText(html, 'html'))
 
-    with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+    try:
+        # Connexion spécifique à Outlook/Office365
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls() # On active la sécurité TLS ici
         server.login(EMAIL_USER, EMAIL_PASS)
         server.send_message(msg)
+        server.quit()
+        print(f"Email envoyé avec succès : {entry.title}")
+    except Exception as e:
+        print(f"Erreur lors de l'envoi : {e}")
 
 def run():
     feed = feedparser.parse(RSS_URL)
     
-    # On lit le dernier ID traité pour éviter les doublons
     if os.path.exists("last_id.txt"):
         with open("last_id.txt", "r") as f:
             last_id = f.read().strip()
@@ -53,14 +64,13 @@ def run():
         new_entries.append(entry)
 
     if new_entries:
-        # On traite du plus vieux au plus récent
         for entry in reversed(new_entries):
-            print(f"Envoi de : {entry.title}")
             send_email(entry)
         
-        # On sauvegarde le nouvel ID le plus récent
         with open("last_id.txt", "w") as f:
             f.write(feed.entries[0].id)
+    else:
+        print("Aucune nouveauté dans le flux.")
 
 if __name__ == "__main__":
     run()
