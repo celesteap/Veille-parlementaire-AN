@@ -7,9 +7,9 @@ from email.mime.multipart import MIMEMultipart
 # Configuration via les secrets GitHub
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 465
-EMAIL_USER = os.environ['newdocan@outlook.com']
-EMAIL_PASS = os.environ['M@theo34']
-DEST_EMAIL = os.environ['newdocan@outlook.com']
+EMAIL_USER = os.environ['EMAIL_USER']
+EMAIL_PASS = os.environ['EMAIL_PASS']
+DEST_EMAIL = os.environ['DEST_EMAIL']
 
 RSS_URL = "http://www2.assemblee-nationale.fr/feeds/detail/documents-parlementaires"
 
