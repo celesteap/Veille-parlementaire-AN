@@ -5,8 +5,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # Configuration via les secrets GitHub
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 465
+SMTP_SERVER = "smtp.office365.com"
+SMTP_PORT = 587
 EMAIL_USER = os.environ['EMAIL_USER']
 EMAIL_PASS = os.environ['EMAIL_PASS']
 DEST_EMAIL = os.environ['DEST_EMAIL']
