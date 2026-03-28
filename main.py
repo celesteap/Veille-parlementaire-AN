@@ -38,9 +38,9 @@ def send_email(entry):
     msg.attach(MIMEText(html, 'html'))
 
     try:
-        # Connexion spécifique à Outlook/Office365
+        # Connexion spécifique à Outlook
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls() # On active la sécurité TLS ici
+        server.starttls() 
         server.login(EMAIL_USER, EMAIL_PASS)
         server.send_message(msg)
         server.quit()
